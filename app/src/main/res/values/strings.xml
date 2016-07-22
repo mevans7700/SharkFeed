@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Shark Feed</string>
+
+    <string name="loading">Loading…</string>
+    <string name="photos_search_hint">Search for photos</string>
+
+    <string name="progress_sharks">Loading Shark photos…</string>
+    <string name="progress_photo_info">Getting photo info please waiting…</string>
+    <string name="progress_download">Downloading photo to your gallery</string>
+    <string name="error_title">Server Error</string>
+    <string name="error_text">Unexpected response from server:</string>
+    <string name="photo_get_error">Something unexpected happened. We were not able to display the list of photos. Please try again.</string>
+    <string name="nostorage_title">No Storage</string>
+    <string name="nostorage_text">No external storage available</string>
+    <string name="download_completed_title">Download Complete</string>
+    <string name="download_completed_text">Your photo has downloaded and is avaiable in your gallery!</string>
+    <string name="download_label">Download</string>
+    <string name="open_in_app_label">Open in App</string>
+</resources>
