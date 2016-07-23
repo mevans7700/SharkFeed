@@ -114,7 +114,8 @@ public class PhotoListService {
                 // called when response HTTP status is "4XX" (eg. 401, 403, 404)
                 Utils.printLogInfo(TAG, "- Failed !: " + statusCode);
 
-                processFailureRepsonse(handler, new String(responseBody), e.toString());
+
+                processFailureRepsonse(handler, (responseBody != null ? new String(responseBody) : ""), e.toString());
             }
         });
     }

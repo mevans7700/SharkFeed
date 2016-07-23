@@ -2,10 +2,13 @@ package com.evansappwriter.sharkfeed.ui;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.media.MediaScannerConnection;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
@@ -90,53 +93,60 @@ public class SharkActivity extends BaseActivity {
         TextView descTV = (TextView) findViewById(R.id.desc_tv);
         descTV.setText(photo.getTitle());
 
+        // Button Download
         Button downBtn = (Button) findViewById(R.id.download_btn);
         downBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                enableProgress();
-                Glide.with(getApplicationContext())
-                .load(photo.getUrlOriginal())
-                .asBitmap()
-                .into(new SimpleTarget<Bitmap>() {
-                            @Override
-                            public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+                if (!isNetworkAvailable() ) {
+                    showError(getString(R.string.error_no_connection_title), getString(R.string.error_no_connection), null);
+                } else {
+                    enableProgress();
+                    Glide.with(getApplicationContext())
+                            .load(photo.getUrlOriginal())
+                            .asBitmap()
+                            .into(new SimpleTarget<Bitmap>() {
+                                @Override
+                                public void onResourceReady(Bitmap bitmap, GlideAnimation anim) {
+                                    // first check the external storage availability
+                                    if (!isExternalStorageAvailable()) {
+                                        showMessage(getString(R.string.nostorage_title), getString(R.string.nostorage_text), null);
+                                    } else {
+                                        String cameraImagePath =  getNewImagePath();
 
-                                // first check the external storage availability
-                                if (!isExternalStorageAvailable()) {
-                                    showMessage(getString(R.string.nostorage_title), getString(R.string.nostorage_text), null);
-                                    return;
+                                        try {
+                                            FileOutputStream out = new FileOutputStream(cameraImagePath);
+                                            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+                                            out.flush();
+                                            out.close();
+
+                                            // send a notification to the media scanner
+                                            updateMedia(cameraImagePath);
+                                        } catch(Exception e) {
+                                            Utils.printLogInfo(TAG,e.toString());
+                                        }
+                                        disableProgress();
+                                        showMessage(getString(R.string.download_completed_title),getString(R.string.download_completed_text),null);
+                                    }
                                 }
-
-                                String cameraImagePath =  getNewImagePath();
-
-                                try {
-                                    FileOutputStream out = new FileOutputStream(cameraImagePath);
-                                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-                                    out.flush();
-                                    out.close();
-
-                                    // send a notification to the media scanner
-                                    updateMedia(cameraImagePath);
-                                } catch(Exception e) {
-                                    Utils.printLogInfo(TAG,e.toString());
-                                }
-                                disableProgress();
-                                showMessage(getString(R.string.download_completed_title),getString(R.string.download_completed_text),null);
-                            }
-                });
+                            });
+                }
             }
         });
 
-        // initialize photo webpage variable
-
-
+        // Launch flixr website
         Button openBtn = (Button) findViewById(R.id.app_btn);
         openBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mPhotoPage));
-                startActivity(browserIntent);
+                if (TextUtils.isEmpty(mPhotoPage)) {
+                    showError(getString(R.string.app_launch_error_title), getString(R.string.app_launch_error_text), null);
+                } else if (!isNetworkAvailable() ) {
+                    showError(getString(R.string.error_no_connection_title), getString(R.string.error_no_connection), null);
+                } else {
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mPhotoPage));
+                    startActivity(browserIntent);
+                }
             }
         });
 
@@ -282,8 +292,17 @@ public class SharkActivity extends BaseActivity {
                 if (this == null || isFinishing()) {
                     return;
                 }
+
+                dismissProgress();
             }
         });
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     @Override

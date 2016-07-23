@@ -5,7 +5,7 @@
     <string name="photos_search_hint">Search for photos</string>
 
     <string name="progress_sharks">Loading Shark photos…</string>
-    <string name="progress_photo_info">Getting photo info please waiting…</string>
+    <string name="progress_photo_info">Getting photo info please wait…</string>
     <string name="progress_download">Downloading photo to your gallery</string>
     <string name="error_title">Server Error</string>
     <string name="error_text">Unexpected response from server:</string>
@@ -16,4 +16,8 @@
     <string name="download_completed_text">Your photo has downloaded and is avaiable in your gallery!</string>
     <string name="download_label">Download</string>
     <string name="open_in_app_label">Open in App</string>
+    <string name="app_launch_error_title">Access Denied</string>
+    <string name="app_launch_error_text">Could not get photo info to lauch website.  Please try again later.</string>
+    <string name="error_no_connection_title">Network Error!</string>
+    <string name="error_no_connection">Please check your internet connection.</string>
 </resources>
