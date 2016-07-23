@@ -99,7 +99,7 @@ public class SharkActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (!isNetworkAvailable() ) {
-                    showError(getString(R.string.error_no_connection_title), getString(R.string.error_no_connection), null);
+                    showMessage(getString(R.string.error_no_connection_title), getString(R.string.error_no_connection), null);
                 } else {
                     enableProgress();
                     Glide.with(getApplicationContext())
@@ -140,9 +140,9 @@ public class SharkActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 if (TextUtils.isEmpty(mPhotoPage)) {
-                    showError(getString(R.string.app_launch_error_title), getString(R.string.app_launch_error_text), null);
+                    showMessage(getString(R.string.app_launch_error_title), getString(R.string.app_launch_error_text), null);
                 } else if (!isNetworkAvailable() ) {
-                    showError(getString(R.string.error_no_connection_title), getString(R.string.error_no_connection), null);
+                    showMessage(getString(R.string.error_no_connection_title), getString(R.string.error_no_connection), null);
                 } else {
                     Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(mPhotoPage));
                     startActivity(browserIntent);

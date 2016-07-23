@@ -95,6 +95,8 @@ public class SharksAdapter extends RecyclerView.Adapter<SharksAdapter.ViewHolder
                 .load(url)
                 .thumbnail(0.5f)
                 .crossFade()
+                .placeholder(R.drawable.default_photo)
+                .error(R.drawable.default_photo)
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.mImageView);
     }

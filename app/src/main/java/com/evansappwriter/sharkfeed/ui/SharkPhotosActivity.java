@@ -2,12 +2,15 @@ package com.evansappwriter.sharkfeed.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Parcelable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 
 import com.evansappwriter.sharkfeed.util.EndlessRecyclerViewScrollListener;
 import com.evansappwriter.sharkfeed.R;
@@ -71,6 +74,11 @@ public class SharkPhotosActivity extends BaseActivity {
         mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                if (!isNetworkAvailable()) {
+                    Toast.makeText(SharkPhotosActivity.this, getString(R.string.error_no_connection), Toast.LENGTH_SHORT).show();
+                    mSwipeContainer.setRefreshing(false);
+                    return;
+                }
                 getSharkImages(0);
             }
         });
@@ -80,6 +88,10 @@ public class SharkPhotosActivity extends BaseActivity {
 
             @Override
             public void onClick(View view, int position) {
+                if (!isNetworkAvailable()) {
+                    Toast.makeText(SharkPhotosActivity.this, getString(R.string.error_no_connection), Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 Photo p = mAdapter.getItem(position);
                 Intent i = new Intent(SharkPhotosActivity.this,SharkActivity.class);
                 i.putExtra(Keys.KEY_PHOTO, p);
@@ -96,6 +108,9 @@ public class SharkPhotosActivity extends BaseActivity {
         mRecyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(mLayoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount) {
+                if (!isNetworkAvailable()) {
+                    return;
+                }
                 getSharkImages(page);
             }
         });
@@ -160,6 +175,13 @@ public class SharkPhotosActivity extends BaseActivity {
                 showError(getString(R.string.error_title), getString(R.string.photo_get_error), null);
             }
         });
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     @Override
